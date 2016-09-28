@@ -1,0 +1,175 @@
+﻿<!doctype html>
+<html ng-app="myApp">
+<head>
+    <title>Employee Management Tool</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.1/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.1/ui-bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.1/ui-bootstrap-tpls.min.js"></script>
+	
+	<link rel="stylesheet" href="css/ge.css" />
+	<script src="js/appModule.js"></script>
+	<script src="js/appServices.js"></script>
+	<script src="js/appController.js"></script>
+	
+</head>
+<body ng-controller="myCtrl" style="background-color:#eeeeee">
+    <div class="jumbotron banner">
+        <div class="row">
+            <div class="col-sm-3" style="text-align:center;padding-top:40px">
+                <img class="gelogo" src="images/gelogo2.png" />
+                <h4 class="tagline">Imagination at work</h4>
+            </div>
+            <div class="col-sm-5">
+                <img style="height:100px;padding-left:48%;padding-top:30px" src="images/empicon2.png" /><br />
+                <h1 class="txtlogo">Employee Management Tool</h1><br />
+            </div>
+            <div class="col-sm-4"></div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row" style="padding-bottom:20px">
+		<div class="col-sm-6">
+            <input type="text" ng-model="searchEmp" class="custPlaceholder" placeholder="&#x1f50d;  Search for employees"  />
+	     </div>
+		 <div class="col-sm-6" style="padding-top:2px">
+            <button type="button" class="btnprimary" style="width:170px" ng-click="addEmp()"><i class="fa fa-plus-circle"></i> &nbsp; ADD</button>
+            <button type="button" class="btnprimary" style="width:170px;" ng-click="editEmp()"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> &nbsp; EDIT</button>
+            <button type="button" class="btnprimary" style="width:170px" ng-click="delEmp()"><i class="fa fa-trash-o" aria-hidden="true"></i> &nbsp; DELETE</button>
+		</div>
+        </div>
+    <table class="table table-bordered">
+    <thead>
+    <tr>
+     <th class="tblheader">
+      <input type="checkbox" class="checkboxList" ng-model="masterCheck" ng-click="selectAll()" />
+    </th>
+    <th class="tblheader">Name</th>
+    <th class="tblheader">City</th>
+    <th class="tblheader">Age</th>
+    <th class="tblheader">Email</th>
+	<th class="tblheader">Salary</th>
+    </tr>
+    </thead>
+    <tbody style="background-color:white;font-size:18px;font-family:arial;text-align:center">
+    <tr ng-repeat="x in records.slice(((currentPage-1)*itemsPerPage),((currentPage)*itemsPerPage)) | filter : searchEmp">
+    <td>      
+	<input type="checkbox" class="checkboxList" ng-checked="selection.indexOf(x) > -1" ng-click="toggleSelection(x)" />
+	</td>
+    <td style="text-align:left">{{x.name | capitalize}}</td>
+    <td style="text-align:left">{{x.city| capitalize}}</td>
+    <td style="text-align:left">{{x.age}}</td>
+    <td style="text-align:left">{{x.email| capitalize}}</td>
+	<td style="text-align:left">{{x.salary}}</td>
+    </tr>
+    <tr>	
+    </tbody>
+    </table>
+	<div>
+	<span>
+	Number of records 
+    <select ng-model="viewby" ng-change="setItemsPerPage(viewby)" >
+        <option>10</option>
+        <option>20</option>
+        <option>30</option>
+        <option>40</option>
+        <option>50</option>
+    </select>
+	</span>
+	<span>
+	<pagination style="float:right;margin:0px;padding:0px;" total-items="totalItems" ng-model="currentPage" ng-change="pageChanged()" class="pagination-sm" items-per-page="itemsPerPage"></pagination>
+	</span>
+	</div>
+	
+    </div>
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#444;">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
+                    <img style="height:60px;margin-top:-20px" src="images/gelogo2.png" />
+                    <h1 style="color:white;display:inline-block;padding-left:20%;font-size:30px">{{modalTitle}}</h1>
+                </div>
+                <div class="modal-body">
+					<form id="addEmpform" class="form-horizontal">
+                     <div ng-show="!delSuccessfully">
+						<div class="form-group has-feedback">
+							<label for="fname" class="control-label col-md-3">Name :</label>
+							<div class="col-md-8">
+								<input type="text" name="fname" id="fname" class="form-control" style="width:100%" placeholder="Enter employee's name" ng-model="empName" />
+								<span class="glyphicon form-control-feedback" id="fname1"></span>
+						   </div>
+						</div>
+						<div class="form-group has-feedback">
+							<label for="lname" class="control-label col-md-3">City :</label>
+							<div class="col-md-8">
+								<input type="text" name="lname" id="lname" class="form-control" style="width:100%" placeholder="Enter employee's city" ng-model="empCity"/>
+								<span class="glyphicon form-control-feedback" id="lname1"></span>
+							</div>
+						</div>  
+						<div class="form-group has-feedback">
+							<label for="age" class="control-label col-md-3">Age :</label>
+							<div class="col-md-8">
+								<input type="text" name="age" id="age" class="form-control" style="width:100%" placeholder="Enter employee's age" ng-model="empAge" />
+								<span class="glyphicon form-control-feedback" id="age1"></span>
+							</div>
+						</div>  
+						<div class="form-group has-feedback">
+							<label for="email" class="control-label col-md-3">Email :</label>
+							<div class="col-md-8">
+								<input type="text" name="email" id="email" class="form-control" style="width:100%" placeholder="Enter employee's email" ng-model="empEmail" />
+								<span class="glyphicon form-control-feedback" id="email1"></span>
+							</div>
+						</div>  
+						<div class="form-group has-feedback">
+							<label for="salary" class="control-label col-md-3">Salary :</label>
+							<div class="col-md-8">
+								<input type="text" name="salary" id="salary" class="form-control" style="width:100%" placeholder="Enter employee's salary" ng-model="empSalary" />
+								<span class="glyphicon form-control-feedback" id="salary1"></span> 
+							</div>
+						</div>
+                    </div>
+						<span ng-if="delSuccessfully">{{errorMsg}}</span>						
+                </div>
+                <div class="modal-footer">
+				    <span style="color:red;float:left" ng-if="delloading"><i class="fa fa-spinner fa-pulse fa-2x fa-fw" ></i>   {{delMessage}}</span>
+		            <button type="submit" class="btnprimary" style="width:170px" ng-if="delSuccessfully" ng-click="Okbutton('add')"><i class="fa fa-check" aria-hidden="true"></i> &nbsp; OK</button>
+				    <button type="submit" class="btnprimary" style="width:170px" ng-if="!delSuccessfully" ng-click="SaveEmployee(empName,empCity,empAge,empEmail,empSalary)"><i class="fa fa-floppy-o" aria-hidden="true"></i> &nbsp; save</button>
+                    <button type="button" class="btnprimary" style="width:170px" ng-if="!delSuccessfully" data-dismiss="modal"><i class="fa fa-ban" aria-hidden="true"></i> &nbsp; CANCEL</button>
+                </div>
+				</form>
+            </div>
+        </div>
+    </div>
+	
+	
+	<div class="modal fade" id="errorModal" role="dialog"> 
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color:rgb(204,0,0)">
+          <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
+          <h4 class="modal-title"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>    {{msgTitle}}</h4>
+        </div>
+        <div class="modal-body">
+          <p>{{errorMsg}}</p>
+        </div>
+		<div class="modal-footer" ng-show="confirmdel">
+		<span style="color:red;float:left" ng-if="delloading"><i class="fa fa-spinner fa-pulse fa-2x fa-fw" ></i>   {{delMessage}}</span>
+		    <button type="submit" class="btnprimary" style="width:170px" ng-if="delSuccessfully" ng-click="Okbutton('del')"><i class="fa fa-check" aria-hidden="true"></i> &nbsp; OK</button>
+			<button type="submit" class="btnprimary" style="width:170px" ng-if="!delSuccessfully" ng-click="ConfirmDelete()"><i class="fa fa-trash-o" aria-hidden="true"></i> &nbsp; DELETE</button>
+            <button type="button" class="btnprimary" style="width:170px" ng-if="!delSuccessfully" data-dismiss="modal"><i class="fa fa-ban" aria-hidden="true"></i> &nbsp; CANCEL</button>
+		</div>
+      </div>
+    </div>
+  </div> 
+</body>
+</html>
+
+
